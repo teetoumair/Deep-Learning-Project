@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#12213f" />
+  <meta name="description" content="Fashion-MNIST clothing classification with a Convolutional Neural Network. Upload an image and get a live prediction from the trained Keras model." />
+  <meta name="api-base" content="" />
+  <title>Fashion-MNIST CNN | Live Clothing Classifier</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2312213f'/%3E%3Cpath d='M20 42c8-1 10-9 15-18 2-4 5-5 8-2l7 6c3 3 6 5 10 6l-4 10H22c-3 0-4-2-2-2Z' fill='%238de1c2'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#0f172a",
+            navy: "#12213f",
+            coral: "#f97365",
+            mint: "#8de1c2",
+            cloud: "#f6f8fb"
+          },
+          fontFamily: {
+            sans: ["DM Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+            mono: ["DM Mono", "ui-monospace", "SFMono-Regular", "monospace"]
+          },
+          boxShadow: {
+            soft: "0 24px 70px rgba(15, 23, 42, .10)",
+            lift: "0 18px 45px rgba(15, 23, 42, .12)"
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root { color-scheme: light; }
+    html { scroll-behavior: smooth; }
+    body { font-family: "DM Sans", sans-serif; background: #f6f8fb; color: #0f172a; }
+    .mono { font-family: "DM Mono", monospace; }
+    .hero-grid {
+      background-image: linear-gradient(rgba(141, 225, 194, .06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(141, 225, 194, .06) 1px, transparent 1px);
+      background-size: 44px 44px;
+    }
+    .pixelated { image-rendering: pixelated; }
+    #siteHeader { background: transparent; transition: background .25s ease, box-shadow .25s ease; }
+    #siteHeader.is-scrolled { background: rgba(18, 33, 63, .94); backdrop-filter: blur(14px); box-shadow: 0 12px 30px rgba(15, 23, 42, .18); }
+    .dropzone-active { border-color: #f97365 !important; background: #fff7f5 !important; transform: translateY(-1px); }
+    .sample-button.active { border-color: #f97365; box-shadow: 0 0 0 3px rgba(249, 115, 101, .14); background: #fff7f5; }
+    .bar-fill { transition: width .7s cubic-bezier(.2, .8, .2, 1); }
+    .reveal { animation: reveal .45s ease both; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .pulse-dot { animation: pulseDot 1.8s ease-in-out infinite; }
+    @keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+    .scrollbar-none { scrollbar-width: none; }
+    .scrollbar-none::-webkit-scrollbar { display: none; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body class="bg-cloud text-ink antialiased">
+  <a href="#demo" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-mint focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-navy">Skip to live demo</a>
+
+  <header id="siteHeader" class="fixed inset-x-0 top-0 z-50">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10" aria-label="Main navigation">
+      <a href="#top" class="flex items-center gap-3 font-bold tracking-tight text-white">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-mint text-lg text-navy">⌁</span>
+        <span>DL<span class="text-mint">/</span>FASHION</span>
+      </a>
+      <div class="hidden items-center gap-8 text-sm font-medium text-slate-300 md:flex">
+        <a class="transition hover:text-white" href="#overview">Dataset</a>
+        <a class="transition hover:text-white" href="#architecture">Architecture</a>
+        <a class="transition hover:text-white" href="#demo">Live Demo</a>
+        <a class="rounded-full border border-white/20 px-4 py-2 text-white transition hover:bg-white/10" href="#resources">Resources ↗</a>
+      </div>
+      <button id="menuButton" type="button" class="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 text-white transition hover:bg-white/10 md:hidden" aria-expanded="false" aria-controls="mobileMenu" aria-label="Toggle navigation menu">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+      </button>
+    </nav>
+    <div id="mobileMenu" class="hidden border-t border-white/10 bg-navy md:hidden">
+      <div class="mx-auto flex max-w-7xl flex-col gap-1 px-6 py-4 text-sm font-medium text-slate-200">
+        <a class="rounded-lg px-3 py-3 transition hover:bg-white/10" href="#overview">Dataset</a>
+        <a class="rounded-lg px-3 py-3 transition hover:bg-white/10" href="#architecture">Architecture</a>
+        <a class="rounded-lg px-3 py-3 transition hover:bg-white/10" href="#demo">Live Demo</a>
+        <a class="rounded-lg px-3 py-3 transition hover:bg-white/10" href="#resources">Resources</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero-grid relative overflow-hidden bg-navy text-white">
+      <div class="pointer-events-none absolute -right-32 top-16 h-96 w-96 rounded-full bg-coral/20 blur-3xl"></div>
+      <div class="pointer-events-none absolute -left-40 bottom-0 h-96 w-96 rounded-full bg-mint/10 blur-3xl"></div>
+      <div class="relative mx-auto grid max-w-7xl gap-14 px-6 pb-24 pt-36 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:px-10 lg:pb-32 lg:pt-44">
+        <div>
+          <div class="mb-7 inline-flex items-center gap-2 rounded-full border border-mint/30 bg-mint/10 px-3 py-1.5 text-xs font-medium text-mint">
+            <span class="pulse-dot h-1.5 w-1.5 rounded-full bg-mint"></span> LIVE DEEP LEARNING DEMO
+          </div>
+          <h1 class="max-w-3xl text-5xl font-bold leading-[1.03] tracking-[-.05em] sm:text-6xl lg:text-7xl">Teaching machines to see <span class="text-mint">style.</span></h1>
+          <p class="mt-7 max-w-xl text-lg leading-8 text-slate-300">Upload a clothing photo and let a Convolutional Neural Network trained on Fashion-MNIST classify it in real time. No mockups — every prediction comes from the actual Keras model.</p>
+          <div class="mt-9 flex flex-wrap items-center gap-4">
+            <a href="#demo" class="rounded-full bg-coral px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-coral/20 transition hover:-translate-y-0.5 hover:bg-[#ff8375]">Classify an image <span class="ml-2">↓</span></a>
+            <a href="https://github.com/teetoumair/Deep-Learning-Project" target="_blank" rel="noreferrer" class="rounded-full border border-white/20 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/10">View on GitHub ↗</a>
+          </div>
+          <dl class="mt-14 grid grid-cols-3 gap-4 border-t border-white/10 pt-6">
+            <div><dt class="mono text-[10px] uppercase tracking-[.18em] text-slate-400">Dataset</dt><dd class="mt-1 text-2xl font-bold">70,000</dd></div>
+            <div><dt class="mono text-[10px] uppercase tracking-[.18em] text-slate-400">Classes</dt><dd class="mt-1 text-2xl font-bold">10</dd></div>
+            <div><dt class="mono text-[10px] uppercase tracking-[.18em] text-slate-400">Val. accuracy</dt><dd class="mt-1 text-2xl font-bold text-mint">90.16%</dd></div>
+          </dl>
+        </div>
+
+        <div class="relative mx-auto w-full max-w-md">
+          <div class="absolute -inset-4 rounded-[2rem] border border-mint/20"></div>
+          <div class="relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/10 p-4 shadow-2xl backdrop-blur-md">
+            <div class="flex items-center justify-between border-b border-white/10 px-2 pb-4">
+              <span class="mono text-[10px] uppercase tracking-[.2em] text-slate-400">fashion_mnist / cnn</span>
+              <span id="heroStatus" class="flex items-center gap-1.5 text-[10px] text-slate-400"><i class="inline-block h-1.5 w-1.5 rounded-full bg-slate-500"></i><span>checking api…</span></span>
+            </div>
+            <div class="mt-4 grid grid-cols-4 gap-2" aria-hidden="true">
+              <img src="samples/sample-tshirt-1.png" alt="" class="pixelated aspect-square rounded-lg bg-navy/60 p-1" loading="lazy" />
+              <img src="samples/sample-trouser-1.png" alt="" class="pixelated aspect-square rounded-lg bg-navy/60 p-1" loading="lazy" />
+              <img src="samples/sample-pullover-1.png" alt="" class="pixelated aspect-square rounded-lg bg-navy/60 p-1" loading="lazy" />
+              <img src="samples/sample-dress-1.png" alt="" class="pixelated aspect-square rounded-lg bg-navy/60 p-1" loading="lazy" />
+              <img src="samples/sample-coat-1.png" alt="" class="pixelated aspect-square rounded-lg bg-navy/60 p-1" loading="lazy" />
+              <img src="samples/sample-sneaker-1.png" alt="" class="pixelated aspect-square rounded-lg bg-navy/60 p-1" loading="lazy" />
+              <img src="samples/sample-bag-1.png" alt="" class="pixelated aspect-square rounded-lg bg-navy/60 p-1" loading="lazy" />
+              <img src="samples/sample-ankle-boot-1.png" alt="" class="pixelated aspect-square rounded-lg bg-navy/60 p-1" loading="lazy" />
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              <div class="rounded-xl bg-navy/70 p-3"><p class="mono text-[10px] uppercase text-slate-400">parameters</p><p class="mt-1 text-xl font-bold text-mint">121,930</p></div>
+              <div class="rounded-xl bg-navy/70 p-3"><p class="mono text-[10px] uppercase text-slate-400">input</p><p class="mt-1 text-xl font-bold text-white">28 × 28 × 1</p></div>
+            </div>
+            <a href="#demo" class="mt-3 flex items-center justify-between rounded-xl bg-mint px-4 py-3 text-sm font-bold text-navy transition hover:bg-[#a9ecd6]">
+              <span>Run a live prediction</span><span>→</span>
+            </a>
+          </div>
+          <div class="absolute -right-5 -top-5 hidden rounded-2xl border border-white/10 bg-coral px-4 py-3 text-white shadow-xl sm:block">
+            <span class="block text-sm font-bold">TensorFlow + Flask</span>
+            <span class="text-[10px] uppercase tracking-widest text-white/70">real inference api</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="overview" class="mx-auto max-w-7xl px-6 py-24 lg:px-10">
+      <div class="grid gap-14 lg:grid-cols-[.8fr_1.2fr]">
+        <div>
+          <p class="mono text-xs uppercase tracking-[.2em] text-coral">01 / THE DATASET</p>
+          <h2 class="mt-4 text-4xl font-bold tracking-tight text-ink">A small image,<br /><span class="text-slate-400">a lot to learn.</span></h2>
+          <p class="mt-6 max-w-sm text-sm leading-7 text-slate-500">Fashion-MNIST is a drop-in replacement for MNIST built by Zalando Research. Every image is a 28 × 28 grayscale photo of an everyday clothing item, labelled across 10 balanced classes.</p>
+        </div>
+        <div>
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5"><p class="mono text-[10px] uppercase tracking-wider text-slate-400">samples</p><p class="mt-2 text-2xl font-bold">70,000</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-5"><p class="mono text-[10px] uppercase tracking-wider text-slate-400">resolution</p><p class="mt-2 text-2xl font-bold">28×28</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-5"><p class="mono text-[10px] uppercase tracking-wider text-slate-400">split</p><p class="mt-2 text-2xl font-bold">60k / 10k</p></div>
+            <div class="rounded-2xl border border-navy bg-navy p-5 text-white"><p class="mono text-[10px] uppercase tracking-wider text-slate-400">classes</p><p class="mt-2 text-2xl font-bold text-mint">10</p></div>
+          </div>
+          <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5" id="classGrid">
+            <div class="rounded-2xl border border-slate-200 bg-white p-3 text-center"><img src="samples/sample-tshirt-1.png" alt="T-shirt sample" class="pixelated mx-auto h-16 w-16" loading="lazy" /><p class="mt-2 text-xs font-semibold">T-shirt/top</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-3 text-center"><img src="samples/sample-trouser-1.png" alt="Trouser sample" class="pixelated mx-auto h-16 w-16" loading="lazy" /><p class="mt-2 text-xs font-semibold">Trouser</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-3 text-center"><img src="samples/sample-pullover-1.png" alt="Pullover sample" class="pixelated mx-auto h-16 w-16" loading="lazy" /><p class="mt-2 text-xs font-semibold">Pullover</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-3 text-center"><img src="samples/sample-dress-1.png" alt="Dress sample" class="pixelated mx-auto h-16 w-16" loading="lazy" /><p class="mt-2 text-xs font-semibold">Dress</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-3 text-center"><img src="samples/sample-coat-1.png" alt="Coat sample" class="pixelated mx-auto h-16 w-16" loading="lazy" /><p class="mt-2 text-xs font-semibold">Coat</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-3 text-center"><img src="samples/sample-sandal-1.png" alt="Sandal sample" class="pixelated mx-auto h-16 w-16" loading="lazy" /><p class="mt-2 text-xs font-semibold">Sandal</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-3 text-center"><img src="samples/sample-shirt-1.png" alt="Shirt sample" class="pixelated mx-auto h-16 w-16" loading="lazy" /><p class="mt-2 text-xs font-semibold">Shirt</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-3 text-center"><img src="samples/sample-sneaker-1.png" alt="Sneaker sample" class="pixelated mx-auto h-16 w-16" loading="lazy" /><p class="mt-2 text-xs font-semibold">Sneaker</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-3 text-center"><img src="samples/sample-bag-1.png" alt="Bag sample" class="pixelated mx-auto h-16 w-16" loading="lazy" /><p class="mt-2 text-xs font-semibold">Bag</p></div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-3 text-center"><img src="samples/sample-ankle-boot-1.png" alt="Ankle boot sample" class="pixelated mx-auto h-16 w-16" loading="lazy" /><p class="mt-2 text-xs font-semibold">Ankle boot</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture" class="bg-white py-24">
+      <div class="mx-auto max-w-7xl px-6 lg:px-10">
+        <div class="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div><p class="mono text-xs uppercase tracking-[.2em] text-coral">02 / THE ARCHITECTURE</p><h2 class="mt-4 text-4xl font-bold tracking-tight">From pixels to prediction.</h2></div>
+          <p class="max-w-md text-sm leading-6 text-slate-500">A compact CNN learns edges, textures and silhouettes layer by layer, then maps the extracted features to 10 softmax probabilities.</p>
+        </div>
+
+        <div class="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="rounded-2xl border border-slate-200 bg-cloud p-6"><span class="mono text-xs text-coral">01</span><div class="mt-10 text-3xl">▦</div><h3 class="mt-5 font-bold">Input</h3><p class="mt-2 text-sm leading-6 text-slate-500">28 × 28 × 1 grayscale, scaled to [0, 1] before inference.</p></div>
+          <div class="rounded-2xl border border-slate-200 bg-cloud p-6"><span class="mono text-xs text-coral">02</span><div class="mt-10 text-3xl">◈</div><h3 class="mt-5 font-bold">Conv2D + ReLU</h3><p class="mt-2 text-sm leading-6 text-slate-500">32 filters of 3 × 3 learn low-level edges and textures.</p></div>
+          <div class="rounded-2xl border border-slate-200 bg-cloud p-6"><span class="mono text-xs text-coral">03</span><div class="mt-10 text-3xl">⌗</div><h3 class="mt-5 font-bold">Pool + Conv2D</h3><p class="mt-2 text-sm leading-6 text-slate-500">Downsample, then learn 64 richer 3 × 3 feature maps.</p></div>
+          <div class="rounded-2xl border border-navy bg-navy p-6 text-white"><span class="mono text-xs text-mint">04</span><div class="mt-10 text-3xl text-mint">✦</div><h3 class="mt-5 font-bold">Dense + Softmax</h3><p class="mt-2 text-sm leading-6 text-slate-300">Flatten to 1,600 features, then classify across 10 classes.</p></div>
+        </div>
+
+        <div class="mt-10 overflow-hidden rounded-2xl border border-slate-200">
+          <div class="flex items-center justify-between border-b border-slate-200 bg-cloud px-5 py-4">
+            <p class="text-sm font-bold">Layer summary</p>
+            <p class="mono text-xs text-slate-500">121,930 trainable parameters</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-left text-sm">
+              <thead class="bg-white text-xs uppercase tracking-wider text-slate-400">
+                <tr><th class="px-5 py-3 font-medium">Layer</th><th class="px-5 py-3 font-medium">Type</th><th class="px-5 py-3 font-medium">Output shape</th><th class="px-5 py-3 text-right font-medium">Params</th></tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 bg-white">
+                <tr><td class="px-5 py-3 font-medium">input_layer</td><td class="px-5 py-3 text-slate-500">InputLayer</td><td class="mono px-5 py-3 text-slate-600">(28, 28, 1)</td><td class="mono px-5 py-3 text-right text-slate-500">0</td></tr>
+                <tr><td class="px-5 py-3 font-medium">conv2d</td><td class="px-5 py-3 text-slate-500">Conv2D · 32 · 3×3 · ReLU</td><td class="mono px-5 py-3 text-slate-600">(26, 26, 32)</td><td class="mono px-5 py-3 text-right text-slate-500">320</td></tr>
+                <tr><td class="px-5 py-3 font-medium">max_pooling2d</td><td class="px-5 py-3 text-slate-500">MaxPooling2D · 2×2</td><td class="mono px-5 py-3 text-slate-600">(13, 13, 32)</td><td class="mono px-5 py-3 text-right text-slate-500">0</td></tr>
+                <tr><td class="px-5 py-3 font-medium">conv2d_1</td><td class="px-5 py-3 text-slate-500">Conv2D · 64 · 3×3 · ReLU</td><td class="mono px-5 py-3 text-slate-600">(11, 11, 64)</td><td class="mono px-5 py-3 text-right text-slate-500">18,496</td></tr>
+                <tr><td class="px-5 py-3 font-medium">max_pooling2d_1</td><td class="px-5 py-3 text-slate-500">MaxPooling2D · 2×2</td><td class="mono px-5 py-3 text-slate-600">(5, 5, 64)</td><td class="mono px-5 py-3 text-right text-slate-500">0</td></tr>
+                <tr><td class="px-5 py-3 font-medium">flatten</td><td class="px-5 py-3 text-slate-500">Flatten</td><td class="mono px-5 py-3 text-slate-600">(1,600)</td><td class="mono px-5 py-3 text-right text-slate-500">0</td></tr>
+                <tr><td class="px-5 py-3 font-medium">dense</td><td class="px-5 py-3 text-slate-500">Dense · 64 · ReLU</td><td class="mono px-5 py-3 text-slate-600">(64)</td><td class="mono px-5 py-3 text-right text-slate-500">102,464</td></tr>
+                <tr><td class="px-5 py-3 font-medium">dense_1</td><td class="px-5 py-3 text-slate-500">Dense · 10 · Softmax</td><td class="mono px-5 py-3 text-slate-600">(10)</td><td class="mono px-5 py-3 text-right text-slate-500">650</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="demo" class="mx-auto max-w-7xl px-6 py-24 lg:px-10">
+      <div class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <div>
+          <p class="mono text-xs uppercase tracking-[.2em] text-coral">03 / LIVE INFERENCE</p>
+          <h2 class="mt-4 text-4xl font-bold tracking-tight">Ask the model.</h2>
+          <p class="mt-3 max-w-xl text-slate-500">Upload a clothing photo or pick a Fashion-MNIST test sample. The image is sent to the Flask API, preprocessed to 28 × 28 grayscale, and classified by the CNN.</p>
+        </div>
+        <div class="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-500">
+          <span id="demoModelDot" class="h-2 w-2 rounded-full bg-slate-400"></span>
+          <span id="demoModelStatus">Checking model status…</span>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft">
+        <div class="grid lg:grid-cols-2">
+          <div class="p-6 sm:p-10">
+            <div class="flex items-center justify-between">
+              <span class="mono text-xs uppercase tracking-widest text-slate-400">01 / Select an input</span>
+              <span class="rounded-full bg-cloud px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">max 4 MB</span>
+            </div>
+
+            <label id="dropzone" for="fileInput" role="button" tabindex="0" aria-label="Upload a clothing image or drag and drop it here" class="mt-5 flex min-h-[220px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-cloud p-6 text-center transition hover:border-coral hover:bg-[#fff8f6] focus:outline-none focus:ring-4 focus:ring-coral/15">
+              <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/gif" class="sr-only" />
+              <div id="dropPrompt" class="flex flex-col items-center">
+                <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-2xl shadow-sm">⇪</span>
+                <span class="mt-4 text-sm font-bold text-ink">Drag &amp; drop a clothing image</span>
+                <span class="mt-1 text-xs text-slate-500">or click to browse — PNG, JPG, WebP</span>
+              </div>
+              <img id="previewImage" src="" alt="Selected clothing image preview" class="pixelated hidden max-h-52 w-auto rounded-xl bg-white object-contain shadow-sm" />
+            </label>
+
+            <div id="fileMeta" class="mt-3 hidden items-center justify-between rounded-xl bg-cloud px-4 py-3 text-xs">
+              <span id="fileName" class="truncate pr-3 font-medium text-slate-600">image.png</span>
+              <button id="clearButton" type="button" class="shrink-0 rounded-full border border-slate-300 px-3 py-1 font-semibold text-slate-600 transition hover:border-coral hover:text-coral">Remove</button>
+            </div>
+
+            <div class="mt-6">
+              <div class="flex items-center justify-between">
+                <p class="mono text-xs uppercase tracking-widest text-slate-400">or use a test sample</p>
+                <a href="#architecture" class="text-[11px] font-semibold text-slate-400 hover:text-coral">about the model →</a>
+              </div>
+              <div id="sampleList" class="mt-3 grid grid-cols-5 gap-2">
+                <button type="button" class="sample-button rounded-xl border border-slate-200 bg-white p-2 transition hover:-translate-y-0.5 hover:border-coral hover:shadow-sm" data-src="samples/sample-tshirt-1.png" data-label="T-shirt/top"><img src="samples/sample-tshirt-1.png" alt="" class="pixelated mx-auto h-10 w-10" /><span class="mt-1 block truncate text-[10px] font-semibold text-slate-600">T-shirt</span></button>
+                <button type="button" class="sample-button rounded-xl border border-slate-200 bg-white p-2 transition hover:-translate-y-0.5 hover:border-coral hover:shadow-sm" data-src="samples/sample-trouser-1.png" data-label="Trouser"><img src="samples/sample-trouser-1.png" alt="" class="pixelated mx-auto h-10 w-10" /><span class="mt-1 block truncate text-[10px] font-semibold text-slate-600">Trouser</span></button>
+                <button type="button" class="sample-button rounded-xl border border-slate-200 bg-white p-2 transition hover:-translate-y-0.5 hover:border-coral hover:shadow-sm" data-src="samples/sample-pullover-1.png" data-label="Pullover"><img src="samples/sample-pullover-1.png" alt="" class="pixelated mx-auto h-10 w-10" /><span class="mt-1 block truncate text-[10px] font-semibold text-slate-600">Pullover</span></button>
+                <button type="button" class="sample-button rounded-xl border border-slate-200 bg-white p-2 transition hover:-translate-y-0.5 hover:border-coral hover:shadow-sm" data-src="samples/sample-dress-1.png" data-label="Dress"><img src="samples/sample-dress-1.png" alt="" class="pixelated mx-auto h-10 w-10" /><span class="mt-1 block truncate text-[10px] font-semibold text-slate-600">Dress</span></button>
+                <button type="button" class="sample-button rounded-xl border border-slate-200 bg-white p-2 transition hover:-translate-y-0.5 hover:border-coral hover:shadow-sm" data-src="samples/sample-coat-1.png" data-label="Coat"><img src="samples/sample-coat-1.png" alt="" class="pixelated mx-auto h-10 w-10" /><span class="mt-1 block truncate text-[10px] font-semibold text-slate-600">Coat</span></button>
+                <button type="button" class="sample-button rounded-xl border border-slate-200 bg-white p-2 transition hover:-translate-y-0.5 hover:border-coral hover:shadow-sm" data-src="samples/sample-sandal-1.png" data-label="Sandal"><img src="samples/sample-sandal-1.png" alt="" class="pixelated mx-auto h-10 w-10" /><span class="mt-1 block truncate text-[10px] font-semibold text-slate-600">Sandal</span></button>
+                <button type="button" class="sample-button rounded-xl border border-slate-200 bg-white p-2 transition hover:-translate-y-0.5 hover:border-coral hover:shadow-sm" data-src="samples/sample-shirt-1.png" data-label="Shirt"><img src="samples/sample-shirt-1.png" alt="" class="pixelated mx-auto h-10 w-10" /><span class="mt-1 block truncate text-[10px] font-semibold text-slate-600">Shirt</span></button>
+                <button type="button" class="sample-button rounded-xl border border-slate-200 bg-white p-2 transition hover:-translate-y-0.5 hover:border-coral hover:shadow-sm" data-src="samples/sample-sneaker-1.png" data-label="Sneaker"><img src="samples/sample-sneaker-1.png" alt="" class="pixelated mx-auto h-10 w-10" /><span class="mt-1 block truncate text-[10px] font-semibold text-slate-600">Sneaker</span></button>
+                <button type="button" class="sample-button rounded-xl border border-slate-200 bg-white p-2 transition hover:-translate-y-0.5 hover:border-coral hover:shadow-sm" data-src="samples/sample-bag-1.png" data-label="Bag"><img src="samples/sample-bag-1.png" alt="" class="pixelated mx-auto h-10 w-10" /><span class="mt-1 block truncate text-[10px] font-semibold text-slate-600">Bag</span></button>
+                <button type="button" class="sample-button rounded-xl border border-slate-200 bg-white p-2 transition hover:-translate-y-0.5 hover:border-coral hover:shadow-sm" data-src="samples/sample-ankle-boot-1.png" data-label="Ankle boot"><img src="samples/sample-ankle-boot-1.png" alt="" class="pixelated mx-auto h-10 w-10" /><span class="mt-1 block truncate text-[10px] font-semibold text-slate-600">Boot</span></button>
+              </div>
+            </div>
+
+            <div class="mt-6 flex items-start gap-3 rounded-xl bg-cloud px-4 py-3">
+              <input id="invertToggle" type="checkbox" checked class="mt-0.5 h-4 w-4 rounded border-slate-300 text-coral focus:ring-coral/30" />
+              <label for="invertToggle" class="text-xs leading-5 text-slate-500"><span class="font-semibold text-slate-700">Auto-invert bright backgrounds.</span> Fashion-MNIST uses light clothing on black. Photos with a white background are inverted automatically so the model sees a similar distribution.</label>
+            </div>
+
+            <button id="predictButton" type="button" disabled class="mt-6 w-full rounded-xl bg-coral px-5 py-4 text-sm font-bold text-white transition hover:bg-[#ff8375] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500">
+              <span id="predictLabel">Predict with CNN</span>
+              <svg id="predictSpinner" class="ml-2 hidden h-4 w-4 spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+            </button>
+            <p class="mt-3 text-center text-[11px] text-slate-400">Inference runs on the Flask + TensorFlow backend. Nothing is stored.</p>
+          </div>
+
+          <div class="flex flex-col bg-navy p-6 text-white sm:p-10">
+            <div class="flex items-center justify-between">
+              <span class="mono text-xs uppercase tracking-widest text-slate-400">02 / Classification result</span>
+              <span id="elapsedBadge" class="hidden rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold text-mint">— ms</span>
+            </div>
+
+            <div id="resultEmpty" class="flex flex-1 flex-col items-center justify-center py-16 text-center">
+              <span class="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-3xl text-mint">✦</span>
+              <p class="mt-6 text-lg font-bold">Waiting for an input</p>
+              <p class="mt-2 max-w-xs text-sm leading-6 text-slate-400">Select a sample or upload a photo, then run the CNN to see the predicted class and full probability distribution.</p>
+            </div>
+
+            <div id="resultLoading" class="hidden flex-1 flex-col items-center justify-center py-16 text-center">
+              <span class="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5"><svg class="h-7 w-7 spin text-mint" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg></span>
+              <p class="mt-6 text-lg font-bold">Running inference…</p>
+              <p class="mt-2 text-sm text-slate-400">Preprocessing the image and querying the CNN.</p>
+            </div>
+
+            <div id="resultError" class="hidden flex-1 flex-col items-center justify-center py-16 text-center">
+              <span class="flex h-16 w-16 items-center justify-center rounded-2xl border border-coral/30 bg-coral/10 text-3xl text-coral">!</span>
+              <p class="mt-6 text-lg font-bold">Prediction failed</p>
+              <p id="errorMessage" class="mt-2 max-w-xs text-sm leading-6 text-slate-400">Something went wrong.</p>
+              <p class="mt-4 rounded-lg bg-white/5 px-3 py-2 text-[11px] text-slate-400">Make sure the Flask backend is running on port 5000.</p>
+            </div>
+
+            <div id="resultContent" class="hidden flex-1">
+              <div class="reference flex items-end justify-between gap-4 py-6">
+                <div>
+                  <p class="mono text-[10px] uppercase tracking-widest text-slate-400">Predicted class</p>
+                  <p id="resultLabel" class="mt-2 text-4xl font-bold leading-tight">—</p>
+                  <p id="resultRank" class="mt-2 text-xs text-slate-400">Top-1 of 10 classes</p>
+                </div>
+                <div class="shrink-0 text-right">
+                  <p class="mono text-[10px] uppercase tracking-widest text-slate-400">Confidence</p>
+                  <p id="resultConfidence" class="mt-2 text-4xl font-bold text-mint">—</p>
+                </div>
+              </div>
+
+              <div class="mt-2 grid grid-cols-[84px_1fr] items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-3">
+                <div>
+                  <img id="preprocessedImage" src="" alt="The 28 by 28 grayscale image the model saw" class="pixelated h-20 w-20 rounded-xl bg-navy/60" />
+                  <p class="mt-1 text-center text-[10px] uppercase tracking-wider text-slate-500">model input</p>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between text-[10px] uppercase tracking-wider text-slate-400"><span>top 3</span><span>probability</span></div>
+                  <div id="topPredictions" class="mt-2 space-y-2"></div>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <div class="flex items-center justify-between text-[10px] uppercase tracking-wider text-slate-400"><span>all 10 classes</span><span>softmax</span></div>
+                <div id="probabilityBars" class="mt-2 max-h-52 space-y-1.5 overflow-y-auto pr-1" aria-live="polite"></div>
+              </div>
+
+              <p id="preprocessNote" class="mt-4 text-[11px] leading-5 text-slate-500"></p>
+
+              <button id="anotherButton" type="button" class="mt-5 w-full rounded-xl border border-white/15 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/10">Classify another image</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="mt-4 text-center text-xs text-slate-400">Samples are taken from the Fashion-MNIST test split (10,000 images never used for gradient updates). Uploaded photos may be classified less accurately because they differ from the 28 × 28 grayscale training distribution.</p>
+    </section>
+
+    <section id="resources" class="bg-white py-24">
+      <div class="mx-auto max-w-7xl px-6 lg:px-10">
+        <div class="grid gap-10 lg:grid-cols-[.8fr_1.2fr]">
+          <div>
+            <p class="mono text-xs uppercase tracking-[.2em] text-coral">04 / PROJECT RESOURCES</p>
+            <h2 class="mt-4 text-4xl font-bold tracking-tight">Go deeper.</h2>
+            <p class="mt-4 max-w-sm leading-7 text-slate-500">Read the implementation, follow the methodology, and watch the presentation behind the pixels.</p>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-3">
+            <a href="https://github.com/teetoumair/Deep-Learning-Project" target="_blank" rel="noreferrer" class="group rounded-2xl border border-slate-200 p-6 transition hover:-translate-y-1 hover:border-navy hover:shadow-lg">
+              <span class="text-2xl">⌘</span>
+              <h3 class="mt-10 font-bold">GitHub Repository</h3>
+              <p class="mt-2 text-sm text-slate-500">Code, model & deployment</p>
+              <span class="mt-5 block text-sm font-bold text-coral">Explore repo ↗</span>
+            </a>
+            <a href="project-report.pdf" class="group rounded-2xl border border-slate-200 p-6 transition hover:-translate-y-1 hover:border-navy hover:shadow-lg">
+              <span class="text-2xl">▤</span>
+              <h3 class="mt-10 font-bold">Project Report</h3>
+              <p class="mt-2 text-sm text-slate-500">Research & findings</p>
+              <span class="mt-5 block text-sm font-bold text-coral">Read report ↗</span>
+            </a>
+            <a href="https://www.youtube.com/" target="_blank" rel="noreferrer" class="group rounded-2xl border border-slate-200 p-6 transition hover:-translate-y-1 hover:border-navy hover:shadow-lg">
+              <span class="text-2xl">▷</span>
+              <h3 class="mt-10 font-bold">Presentation Video</h3>
+              <p class="mt-2 text-sm text-slate-500">Slides & walkthrough</p>
+              <span class="mt-5 block text-sm font-bold text-coral">Watch on YouTube ↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-navy text-white">
+    <div class="mx-auto flex max-w-7xl flex-col justify-between gap-8 px-6 py-12 md:flex-row md:items-end lg:px-10">
+      <div>
+        <a href="#top" class="flex items-center gap-3 font-bold tracking-tight"><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-mint text-navy">⌁</span> DL<span class="text-mint">/</span>FASHION</a>
+        <p class="mt-5 max-w-sm text-sm leading-6 text-slate-400">Fashion-MNIST classification with a Convolutional Neural Network, served by a Flask inference API.</p>
+      </div>
+      <div class="text-left text-sm text-slate-400 md:text-right">
+        <p class="font-semibold text-slate-200">Deep Learning Semester Project</p>
+        <p class="mt-1">Submitted by Teetou Mair · 2024–25</p>
+        <p class="mt-5 text-xs">Built with Python, Flask, TensorFlow &amp; Tailwind CSS</p>
+        <p class="mt-1 text-xs">© <span id="year">2025</span> DL/FASHION · Educational project</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

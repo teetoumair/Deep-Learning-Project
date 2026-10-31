@@ -1,0 +1,422 @@
+[
+  {
+    "file": "sample-ankle-boot-1.png",
+    "label": 9,
+    "className": "ankle-boot",
+    "classIndex": 9,
+    "testIndex": 0
+  },
+  {
+    "file": "sample-pullover-1.png",
+    "label": 2,
+    "className": "pullover",
+    "classIndex": 2,
+    "testIndex": 1
+  },
+  {
+    "file": "sample-trouser-1.png",
+    "label": 1,
+    "className": "trouser",
+    "classIndex": 1,
+    "testIndex": 2
+  },
+  {
+    "file": "sample-trouser-2.png",
+    "label": 1,
+    "className": "trouser",
+    "classIndex": 1,
+    "testIndex": 3
+  },
+  {
+    "file": "sample-shirt-1.png",
+    "label": 6,
+    "className": "shirt",
+    "classIndex": 6,
+    "testIndex": 4
+  },
+  {
+    "file": "sample-trouser-3.png",
+    "label": 1,
+    "className": "trouser",
+    "classIndex": 1,
+    "testIndex": 5
+  },
+  {
+    "file": "sample-coat-1.png",
+    "label": 4,
+    "className": "coat",
+    "classIndex": 4,
+    "testIndex": 6
+  },
+  {
+    "file": "sample-shirt-2.png",
+    "label": 6,
+    "className": "shirt",
+    "classIndex": 6,
+    "testIndex": 7
+  },
+  {
+    "file": "sample-sandal-1.png",
+    "label": 5,
+    "className": "sandal",
+    "classIndex": 5,
+    "testIndex": 8
+  },
+  {
+    "file": "sample-sneaker-1.png",
+    "label": 7,
+    "className": "sneaker",
+    "classIndex": 7,
+    "testIndex": 9
+  },
+  {
+    "file": "sample-coat-2.png",
+    "label": 4,
+    "className": "coat",
+    "classIndex": 4,
+    "testIndex": 10
+  },
+  {
+    "file": "sample-sandal-2.png",
+    "label": 5,
+    "className": "sandal",
+    "classIndex": 5,
+    "testIndex": 11
+  },
+  {
+    "file": "sample-sneaker-2.png",
+    "label": 7,
+    "className": "sneaker",
+    "classIndex": 7,
+    "testIndex": 12
+  },
+  {
+    "file": "sample-dress-1.png",
+    "label": 3,
+    "className": "dress",
+    "classIndex": 3,
+    "testIndex": 13
+  },
+  {
+    "file": "sample-coat-3.png",
+    "label": 4,
+    "className": "coat",
+    "classIndex": 4,
+    "testIndex": 14
+  },
+  {
+    "file": "sample-trouser-4.png",
+    "label": 1,
+    "className": "trouser",
+    "classIndex": 1,
+    "testIndex": 15
+  },
+  {
+    "file": "sample-pullover-2.png",
+    "label": 2,
+    "className": "pullover",
+    "classIndex": 2,
+    "testIndex": 16
+  },
+  {
+    "file": "sample-coat-4.png",
+    "label": 4,
+    "className": "coat",
+    "classIndex": 4,
+    "testIndex": 17
+  },
+  {
+    "file": "sample-bag-1.png",
+    "label": 8,
+    "className": "bag",
+    "classIndex": 8,
+    "testIndex": 18
+  },
+  {
+    "file": "sample-tshirt-1.png",
+    "label": 0,
+    "className": "tshirt",
+    "classIndex": 0,
+    "testIndex": 19
+  },
+  {
+    "file": "sample-pullover-3.png",
+    "label": 2,
+    "className": "pullover",
+    "classIndex": 2,
+    "testIndex": 20
+  },
+  {
+    "file": "sample-sandal-3.png",
+    "label": 5,
+    "className": "sandal",
+    "classIndex": 5,
+    "testIndex": 21
+  },
+  {
+    "file": "sample-sneaker-3.png",
+    "label": 7,
+    "className": "sneaker",
+    "classIndex": 7,
+    "testIndex": 22
+  },
+  {
+    "file": "sample-ankle-boot-2.png",
+    "label": 9,
+    "className": "ankle-boot",
+    "classIndex": 9,
+    "testIndex": 23
+  },
+  {
+    "file": "sample-trouser-5.png",
+    "label": 1,
+    "className": "trouser",
+    "classIndex": 1,
+    "testIndex": 24
+  },
+  {
+    "file": "sample-coat-5.png",
+    "label": 4,
+    "className": "coat",
+    "classIndex": 4,
+    "testIndex": 25
+  },
+  {
+    "file": "sample-shirt-3.png",
+    "label": 6,
+    "className": "shirt",
+    "classIndex": 6,
+    "testIndex": 26
+  },
+  {
+    "file": "sample-tshirt-2.png",
+    "label": 0,
+    "className": "tshirt",
+    "classIndex": 0,
+    "testIndex": 27
+  },
+  {
+    "file": "sample-ankle-boot-3.png",
+    "label": 9,
+    "className": "ankle-boot",
+    "classIndex": 9,
+    "testIndex": 28
+  },
+  {
+    "file": "sample-dress-2.png",
+    "label": 3,
+    "className": "dress",
+    "classIndex": 3,
+    "testIndex": 29
+  },
+  {
+    "file": "sample-bag-2.png",
+    "label": 8,
+    "className": "bag",
+    "classIndex": 8,
+    "testIndex": 30
+  },
+  {
+    "file": "sample-bag-3.png",
+    "label": 8,
+    "className": "bag",
+    "classIndex": 8,
+    "testIndex": 31
+  },
+  {
+    "file": "sample-dress-3.png",
+    "label": 3,
+    "className": "dress",
+    "classIndex": 3,
+    "testIndex": 32
+  },
+  {
+    "file": "sample-dress-4.png",
+    "label": 3,
+    "className": "dress",
+    "classIndex": 3,
+    "testIndex": 33
+  },
+  {
+    "file": "sample-bag-4.png",
+    "label": 8,
+    "className": "bag",
+    "classIndex": 8,
+    "testIndex": 34
+  },
+  {
+    "file": "sample-tshirt-3.png",
+    "label": 0,
+    "className": "tshirt",
+    "classIndex": 0,
+    "testIndex": 35
+  },
+  {
+    "file": "sample-sneaker-4.png",
+    "label": 7,
+    "className": "sneaker",
+    "classIndex": 7,
+    "testIndex": 36
+  },
+  {
+    "file": "sample-sandal-4.png",
+    "label": 5,
+    "className": "sandal",
+    "classIndex": 5,
+    "testIndex": 37
+  },
+  {
+    "file": "sample-sneaker-5.png",
+    "label": 7,
+    "className": "sneaker",
+    "classIndex": 7,
+    "testIndex": 38
+  },
+  {
+    "file": "sample-ankle-boot-4.png",
+    "label": 9,
+    "className": "ankle-boot",
+    "classIndex": 9,
+    "testIndex": 39
+  },
+  {
+    "file": "sample-shirt-4.png",
+    "label": 6,
+    "className": "shirt",
+    "classIndex": 6,
+    "testIndex": 40
+  },
+  {
+    "file": "sample-trouser-6.png",
+    "label": 1,
+    "className": "trouser",
+    "classIndex": 1,
+    "testIndex": 41
+  },
+  {
+    "file": "sample-dress-5.png",
+    "label": 3,
+    "className": "dress",
+    "classIndex": 3,
+    "testIndex": 42
+  },
+  {
+    "file": "sample-sneaker-6.png",
+    "label": 7,
+    "className": "sneaker",
+    "classIndex": 7,
+    "testIndex": 43
+  },
+  {
+    "file": "sample-shirt-5.png",
+    "label": 6,
+    "className": "shirt",
+    "classIndex": 6,
+    "testIndex": 44
+  },
+  {
+    "file": "sample-pullover-4.png",
+    "label": 2,
+    "className": "pullover",
+    "classIndex": 2,
+    "testIndex": 46
+  },
+  {
+    "file": "sample-pullover-5.png",
+    "label": 2,
+    "className": "pullover",
+    "classIndex": 2,
+    "testIndex": 48
+  },
+  {
+    "file": "sample-pullover-6.png",
+    "label": 2,
+    "className": "pullover",
+    "classIndex": 2,
+    "testIndex": 49
+  },
+  {
+    "file": "sample-coat-6.png",
+    "label": 4,
+    "className": "coat",
+    "classIndex": 4,
+    "testIndex": 50
+  },
+  {
+    "file": "sample-sandal-5.png",
+    "label": 5,
+    "className": "sandal",
+    "classIndex": 5,
+    "testIndex": 52
+  },
+  {
+    "file": "sample-bag-5.png",
+    "label": 8,
+    "className": "bag",
+    "classIndex": 8,
+    "testIndex": 53
+  },
+  {
+    "file": "sample-bag-6.png",
+    "label": 8,
+    "className": "bag",
+    "classIndex": 8,
+    "testIndex": 56
+  },
+  {
+    "file": "sample-tshirt-4.png",
+    "label": 0,
+    "className": "tshirt",
+    "classIndex": 0,
+    "testIndex": 59
+  },
+  {
+    "file": "sample-sandal-6.png",
+    "label": 5,
+    "className": "sandal",
+    "classIndex": 5,
+    "testIndex": 63
+  },
+  {
+    "file": "sample-dress-6.png",
+    "label": 3,
+    "className": "dress",
+    "classIndex": 3,
+    "testIndex": 67
+  },
+  {
+    "file": "sample-ankle-boot-5.png",
+    "label": 9,
+    "className": "ankle-boot",
+    "classIndex": 9,
+    "testIndex": 68
+  },
+  {
+    "file": "sample-tshirt-5.png",
+    "label": 0,
+    "className": "tshirt",
+    "classIndex": 0,
+    "testIndex": 71
+  },
+  {
+    "file": "sample-shirt-6.png",
+    "label": 6,
+    "className": "shirt",
+    "classIndex": 6,
+    "testIndex": 73
+  },
+  {
+    "file": "sample-ankle-boot-6.png",
+    "label": 9,
+    "className": "ankle-boot",
+    "classIndex": 9,
+    "testIndex": 83
+  },
+  {
+    "file": "sample-tshirt-6.png",
+    "label": 0,
+    "className": "tshirt",
+    "classIndex": 0,
+    "testIndex": 85
+  }
+]

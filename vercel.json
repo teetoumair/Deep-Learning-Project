@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "flask",
+  "functions": {
+    "app.py": {
+      "maxDuration": 60,
+      "includeFiles": "{fashion_cnn_model.h5,frontend/**}"
+    }
+  }
+}
