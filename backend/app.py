@@ -210,6 +210,7 @@ def project_report():
         REPORT_FILENAME,
         as_attachment=True,
         download_name=REPORT_FILENAME,
+        mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     )
 
 
