@@ -29,7 +29,9 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = BASE_DIR / "frontend"
+DOCUMENT_DIR = BASE_DIR / "Document"
 MODEL_PATH = Path(os.environ.get("MODEL_PATH", BASE_DIR / "fashion_cnn_model.h5"))
+REPORT_FILENAME = "Fashion-MNIST_CNN_Project_Report.docx"
 
 CLASS_NAMES = [
     "T-shirt/top",
@@ -199,6 +201,16 @@ def index():
     if index_file.exists():
         return send_from_directory(FRONTEND_DIR, "index.html")
     return jsonify(success=True, message="Fashion-MNIST CNN API is running.", docs="/api/health")
+
+
+@app.get("/project-report")
+def project_report():
+    return send_from_directory(
+        DOCUMENT_DIR,
+        REPORT_FILENAME,
+        as_attachment=True,
+        download_name=REPORT_FILENAME,
+    )
 
 
 @app.get("/api/health")

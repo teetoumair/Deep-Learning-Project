@@ -4,7 +4,7 @@
   "functions": {
     "app.py": {
       "maxDuration": 60,
-      "includeFiles": "{fashion_cnn_model.h5,frontend/**}"
+      "includeFiles": "{fashion_cnn_model.h5,frontend/**,Document/**}"
     }
   }
 }
